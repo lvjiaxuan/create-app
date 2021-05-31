@@ -6,6 +6,7 @@
     "rimraf": "rimraf ./test"
   },
   "keywords": [],
+  "file": ["index.js"],
   "author": "lvjiaxuan",
   "license": "ISC",
   "description": "",

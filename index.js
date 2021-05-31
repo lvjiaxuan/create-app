@@ -7,6 +7,14 @@ const argv = process.argv.slice(2)
 const { prompt } = require('enquirer')
 const ncuDepsPath = path.join(__dirname, './deps_json/index.json')
 const depsInfo = require(ncuDepsPath)
+const renameFiles = {
+  _gitignore: '.gitignore',
+  _eslintignore: '.eslintignore',
+  '_eslintrc.js': '.eslintrc.js',
+  _prettierignore: '.prettierignore',
+  '_prettierrc.js': '.prettierrc.js',
+  _husky: '.husky',
+}
 
 // const spinner = ora('please wait...').start()
 // spinner.stop()
@@ -21,47 +29,32 @@ const main = async () => {
   })
 
   const targetPath = path.join(cwd, projectName)
-  if(fs.existsSync(targetPath)) {
-
+  if (fs.existsSync(targetPath)) {
   } else {
-    createNewProject()
+    createNewProject(targetPath)
   }
 }
-// main().catch(e => console.error(e))
+main().catch(err => console.error('main', err))
 
 // ===================
 //  helper
 // ===================
 
-function copy(src, dest) {
-  const stat = fs.statSync(src)
-  if (stat.isDirectory()) {
-    copyDir(src, dest)
-  } else {
-    fs.copyFileSync(src, dest)
-  }
-}
-
-function copyDir(srcDir, destDir) {
-  fs.mkdirSync(destDir, { recursive: true })
-  for (const file of fs.readdirSync(srcDir)) {
-    const srcFile = path.resolve(srcDir, file)
-    const destFile = path.resolve(destDir, file)
-    copy(srcFile, destFile)
-  }
-}
-
 async function createNewProject(targetPath) {
   fs.mkdirSync(targetPath, { recursive: true })
-  fs.writeFile(path.join(targetPath, 'package.json'), JSON.stringify(await getPkgJson(), null, 2))
+  copyTemplates(targetPath)
+  fs.writeFile(
+    path.join(targetPath, 'package.json'),
+    JSON.stringify(await getPkgJson(), null, 2),
+    err => {
+      if (err) {
+        throw new Error(err)
+      }
+    }
+  )
 }
 
-function copyTemplates(targetPath) {
-  fs.readdirSync(path.join(__))
-
-}
-
-async function getPkgJson(existPkg = {}) {
+async function getPkgJson(pkg = {}) {
   const upgraded = await ncu.run({
     // Pass any cli option
     packageFile: ncuDepsPath,
@@ -98,9 +91,42 @@ async function getPkgJson(existPkg = {}) {
     license: 'MIT',
     'lint-staged': {
       '*': 'prettier -w -u',
-      '*.{vue,js}': 'eslint --fix'
+      '*.{vue,js}': 'eslint --fix',
     },
-    ...existPkg,
+    ...pkg,
     ...depsInfo,
+  }
+}
+
+function copy(src, dest) {
+  const stat = fs.statSync(src)
+  if (stat.isDirectory()) {
+    copyDir(src, dest)
+  } else {
+    const srcBasename = path.basename(src)
+    fs.copyFileSync(
+      src,
+      path.format({
+        dir: path.dirname(dest),
+        base: renameFiles[srcBasename] ? renameFiles[srcBasename] : srcBasename,
+      })
+    )
+  }
+}
+
+function copyDir(srcDir, destDir) {
+  fs.mkdirSync(destDir, { recursive: true })
+  for (const file of fs.readdirSync(srcDir)) {
+    const srcFile = path.resolve(srcDir, file)
+    const destFile = path.resolve(destDir, file)
+    copy(srcFile, destFile)
+  }
+}
+
+function copyTemplates(targetPath) {
+  const tplPath = path.join(__dirname, 'template')
+  const files = fs.readdirSync(tplPath)
+  for (const file of files) {
+    copy(path.join(tplPath, file), path.join(targetPath, file))
   }
 }

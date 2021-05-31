@@ -1,4 +1,3 @@
 # notes
 
-1. 没有package.json则认为项目全部覆盖
-配置文件直接覆盖，package.json是合并
+- 请按需编辑`_husky/_/post-commit|pre-commit`

@@ -2,17 +2,27 @@
   "name": "lvjx-app",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
-    "rimraf": "rimraf ./test"
+  "scripts": {},
+  "bin": {
+    "lvjx-app": "index.js",
+    "lvjx": "index.js"
   },
   "keywords": [],
-  "file": ["index.js"],
+  "file": [
+    "index.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
   "author": "lvjiaxuan",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "cosmiconfig": "^7.0.0",
     "enquirer": "^2.3.6",
     "npm-check-updates": "^11.5.13",
-    "ora": "^5.4.0"
+    "ora": "^5.4.0",
+    "prettier": "^2.3.0"
   }
 }

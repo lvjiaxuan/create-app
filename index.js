@@ -1,11 +1,20 @@
+#!/usr/bin/env node
+
 const fs = require('fs')
 const path = require('path')
 const ncu = require('npm-check-updates')
 const ora = require('ora')
 const cwd = process.cwd()
 const argv = process.argv.slice(2)
+const { cosmiconfigSync } = require('cosmiconfig')
 const { prompt } = require('enquirer')
+const prettier = require('prettier')
+const prettierConfig = {
+  ...require(path.join(__dirname, 'template/_prettierrc.js')),
+  parser: 'babel',
+}
 const ncuDepsPath = path.join(__dirname, './deps_json/index.json')
+const tplPath = path.join(__dirname, 'template')
 const depsInfo = require(ncuDepsPath)
 const renameFiles = {
   _gitignore: '.gitignore',
@@ -16,22 +25,27 @@ const renameFiles = {
   _husky: '.husky',
 }
 
-// const spinner = ora('please wait...').start()
-// spinner.stop()
-
 const main = async () => {
-  const { projectName } = await prompt({
-    // todo 验证projectName
-    type: 'input',
-    name: 'projectName',
-    message: `Project name:`,
-    initial: 'base-demo',
-  })
+  const projectName = argv[0]
+    ? argv[0]
+    : (
+        await prompt({
+          // todo 验证projectName
+          type: 'input',
+          name: 'projectName',
+          message: '项目名称',
+          initial: 'base-demo',
+        })
+      ).projectName
 
   const targetPath = path.join(cwd, projectName)
   if (fs.existsSync(targetPath)) {
+    console.log('更新已有项目')
+    updateExistProject(targetPath)
   } else {
-    createNewProject(targetPath)
+    const spinner = ora('给你新建一个项目，等一哈啊...').start()
+    await createNewProject(targetPath)
+    spinner.succeed('好了哈~~')
   }
 }
 main().catch(err => console.error('main', err))
@@ -40,17 +54,76 @@ main().catch(err => console.error('main', err))
 //  helper
 // ===================
 
+/**
+ * @method 更新已有项目
+ * @param {string} targetPath 目标项目位置
+ * @returns
+ */
+async function updateExistProject(targetPath) {
+  const explorerSyncs = {
+    babel: cosmiconfigSync('babel').search(targetPath),
+    prettier: cosmiconfigSync('prettier').search(targetPath),
+    eslint: cosmiconfigSync('eslint').search(targetPath),
+  }
+  for (const name in explorerSyncs) {
+    const module = explorerSyncs[name]
+    if (name === 'babel') {
+      console.log('babel')
+
+      const babelTargetPath = path.join(targetPath, `babel.config.js`)
+      const babelTplPath = path.join(tplPath, `babel.config.js`)
+      if (fs.existsSync(babelTargetPath)) {
+        const mergeConfig = deepMerge(require(babelTargetPath), require(babelTplPath))
+        fs.writeFileSync(
+          path.join(targetPath, `babel.config.js`),
+          prettier.format(`module.exports=${JSON.stringify(mergeConfig, null, 2)}`, prettierConfig)
+        )
+      } else {
+        copy(babelTplPath, babelTargetPath)
+      }
+    } else {
+      if (!module || module.isEmpty) {
+        module && module.filepath && fs.unlinkSync(module.filepath)
+        copy(path.join(tplPath, `_${name}rc.js`), path.join(targetPath, `.${name}rc.js`))
+      } else {
+        const mergeConfig = deepMerge(module.config, require(path.join(tplPath, `_${name}rc.js`)))
+        fs.writeFileSync(
+          path.join(targetPath, `.${name}rc.js`),
+          prettier.format(`module.exports=${JSON.stringify(mergeConfig, null, 2)}`, prettierConfig)
+        )
+      }
+
+      const ignoreTargetPath = path.join(targetPath, `.${name}ignore`)
+      const ignoreTplPath = path.join(tplPath, `_${name}ignore`)
+      fs.existsSync(ignoreTargetPath)
+        ? mergeIgnore(ignoreTplPath, ignoreTargetPath)
+        : copy(ignoreTplPath, ignoreTargetPath)
+    }
+  }
+
+  let pkg = {}
+  if (fs.existsSync(path.join(targetPath, 'package.json'))) {
+    pkg = require(path.join(targetPath, 'package.json'))
+  }
+
+  fs.writeFileSync(
+    // 涉及网络异步
+    path.join(targetPath, 'package.json'),
+    JSON.stringify(await getPkgJson(pkg), null, 2)
+  )
+}
+
+/**
+ * @method 创建新项目
+ * @param {string} targetPath 目标项目位置
+ */
 async function createNewProject(targetPath) {
   fs.mkdirSync(targetPath, { recursive: true })
-  copyTemplates(targetPath)
-  fs.writeFile(
+  copyTemplates(targetPath) // 极快的本地操作
+  fs.writeFileSync(
+    // 涉及网络异步
     path.join(targetPath, 'package.json'),
-    JSON.stringify(await getPkgJson(), null, 2),
-    err => {
-      if (err) {
-        throw new Error(err)
-      }
-    }
+    JSON.stringify(await getPkgJson(), null, 2)
   )
 }
 
@@ -60,7 +133,6 @@ async function getPkgJson(pkg = {}) {
     packageFile: ncuDepsPath,
     upgrade: false,
   })
-
   Object.keys(upgraded).forEach(dep => {
     if (Object.prototype.hasOwnProperty.call(depsInfo.dependencies, dep)) {
       depsInfo.dependencies[dep] = upgraded[dep]
@@ -68,7 +140,6 @@ async function getPkgJson(pkg = {}) {
       depsInfo.devDependencies[dep] = upgraded[dep]
     }
   })
-
   return {
     version: '0.0.1',
     description: 'initial demo',
@@ -124,9 +195,56 @@ function copyDir(srcDir, destDir) {
 }
 
 function copyTemplates(targetPath) {
-  const tplPath = path.join(__dirname, 'template')
   const files = fs.readdirSync(tplPath)
   for (const file of files) {
     copy(path.join(tplPath, file), path.join(targetPath, file))
   }
+}
+
+function mergeIgnore(ignoreTplPath, ignoreTargetPath) {
+  const tplArr = fs
+    .readFileSync(ignoreTplPath, { encoding: 'utf8' })
+    .split(/\n|\r/)
+    .filter(i => i)
+  const targetArr = fs
+    .readFileSync(ignoreTargetPath, { encoding: 'utf8' })
+    .split(/\n|\r/)
+    .filter(i => i)
+  const removalDuplicates = [...new Set([...tplArr, ...targetArr])].reduce((acc, item) => {
+    acc += item + '\n'
+    return acc
+  }, '')
+  fs.writeFileSync(
+    // 涉及网络异步
+    ignoreTargetPath,
+    removalDuplicates
+  )
+}
+
+function deepMerge(target, ...args) {
+  return args.reduce((acc, mergeObj) => {
+    if (Object.prototype.toString.call(acc) !== '[object Object]' && !Array.isArray(acc)) {
+      // 基本类型及undefined等直接赋值
+      acc = mergeObj
+      return acc
+    }
+    return Object.keys(mergeObj).reduce((subAcc, key) => {
+      // 遍历对象及数组
+      const mergeValue = mergeObj[key] // 将要被合并的对象
+      if (Object.prototype.toString.call(mergeValue) === '[object Object]') {
+        subAcc[key] = deepMerge(subAcc[key], mergeValue)
+      } else if (Array.isArray(mergeValue)) {
+        subAcc[key] = subAcc[key] ? subAcc[key] : []
+        subAcc[key] = mergeValue.map((item, index) => {
+          if (Object.prototype.toString.call(item) === '[object Object]' || Array.isArray(item)) {
+            return deepMerge(subAcc[key][index], item)
+          }
+          return item
+        })
+      } else {
+        subAcc[key] = mergeValue
+      }
+      return subAcc
+    }, acc)
+  }, target)
 }

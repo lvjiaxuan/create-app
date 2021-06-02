@@ -11,3 +11,10 @@ npm init @lvjx/app
 
 - 请按需编辑`_husky/_/post-commit|pre-commit`
 - 试用中...
+
+# todo
+
+- [ ] dependencies没变就不ncu
+- [ ] 减少tpl copy
+- [ ] git cz
+- [ ] auto publish

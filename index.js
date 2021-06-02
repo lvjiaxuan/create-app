@@ -26,11 +26,10 @@ const renameFiles = {
   _husky: '.husky',
 }
 
-
 const main = async () => {
   let targetPath = ''
   let projectName = ''
-  if(fs.existsSync(path.join(cwd, 'package.json'))) {
+  if (fs.existsSync(path.join(cwd, 'package.json'))) {
     projectName = path.basename(cwd)
     targetPath = cwd
     spinner.start(`更新当前项目（${projectName}）`)
@@ -47,7 +46,7 @@ const main = async () => {
             initial: 'base-demo',
           })
         ).projectName
-  
+
     targetPath = path.join(cwd, projectName)
     if (fs.existsSync(targetPath)) {
       spinner.start(`更新目录下项目${projectName}`)
@@ -102,7 +101,7 @@ async function updateExistProject(targetPath) {
         const mergeConfig = deepMerge(module.config, require(path.join(tplPath, `_${name}rc.js`)))
         fs.writeFileSync(
           path.join(targetPath, `.${name}rc.js`),
-          prettier.format(`module.exports=${JSON.stringify(mergeConfig, null, 2)}`, prettierConfig)
+          getPrettierCjsStr(mergeConfig, prettierConfig)
         )
       }
 
@@ -114,13 +113,17 @@ async function updateExistProject(targetPath) {
     }
   }
 
+  if (!fs.existsSync(path.join(targetPath, '.husky'))) {
+    copy(path.join(tplPath, '_husky'), path.join(targetPath, '.husky'))
+  }
+
   let pkg = {}
   if (fs.existsSync(path.join(targetPath, 'package.json'))) {
     pkg = require(path.join(targetPath, 'package.json'))
   }
 
   fs.writeFileSync(
-    // 涉及网络异步
+    // 涉及网络异步io
     path.join(targetPath, 'package.json'),
     JSON.stringify(await getPkgJson(pkg), null, 2)
   )
@@ -132,12 +135,17 @@ async function updateExistProject(targetPath) {
  */
 async function createNewProject(targetPath) {
   fs.mkdirSync(targetPath, { recursive: true })
-  copyTemplates(targetPath) // 极快的本地操作
+  copyTemplates(targetPath) // 极快的本地io
   fs.writeFileSync(
-    // 涉及网络异步
+    // 涉及网络异步io
     path.join(targetPath, 'package.json'),
     JSON.stringify(await getPkgJson(), null, 2)
   )
+}
+
+function getPrettierCjsStr(mergeConfig, prettierConfig) {
+
+  return ''
 }
 
 async function getPkgJson(pkg = {}) {
@@ -148,7 +156,7 @@ async function getPkgJson(pkg = {}) {
   })
   Object.keys(upgraded).forEach(dep => {
     if (Object.prototype.hasOwnProperty.call(depsInfo.dependencies, dep)) {
-      depsInfo.dependencies[dep] = upgraded[dep]
+      depsInfo.dependencies[dep] =  upgraded[dep]
     } else if (Object.prototype.hasOwnProperty.call(depsInfo.devDependencies, dep)) {
       depsInfo.devDependencies[dep] = upgraded[dep]
     }
@@ -178,7 +186,8 @@ async function getPkgJson(pkg = {}) {
       '*.{vue,js}': 'eslint --fix',
     },
     ...pkg,
-    ...depsInfo,
+    dependencies: deepMerge(pkg.dependencies, depsInfo.dependencies),
+    devDependencies: deepMerge(pkg.devDependencies, depsInfo.devDependencies),
   }
 }
 
@@ -228,7 +237,7 @@ function mergeIgnore(ignoreTplPath, ignoreTargetPath) {
     return acc
   }, '')
   fs.writeFileSync(
-    // 涉及网络异步
+    // 涉及网络异步io
     ignoreTargetPath,
     removalDuplicates
   )

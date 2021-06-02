@@ -55,10 +55,10 @@ const main = async () => {
     } else {
       spinner.start(`新建${projectName}项目`)
       await createNewProject(targetPath)
-      spawn.sync('npm i', { stdio: 'inherit', cwd: targetPath })
     }
   }
-  spinner.succeed('已完成')
+  spawn.sync('npm i', { stdio: 'inherit', cwd: targetPath })
+  spinner.succeed('@lvjx/app 已完成')
 }
 main().catch(err => {
   console.error('main', err)

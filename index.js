@@ -3,7 +3,7 @@
 const fs = require('fs')
 const path = require('path')
 const ncu = require('npm-check-updates')
-const ora = require('ora')
+const spinner = require('ora')()
 const cwd = process.cwd()
 const argv = process.argv.slice(2)
 const { cosmiconfigSync } = require('cosmiconfig')
@@ -26,32 +26,44 @@ const renameFiles = {
   _husky: '.husky',
 }
 
-const main = async () => {
-  const projectName = argv[0]
-    ? argv[0]
-    : (
-        await prompt({
-          // todo 验证projectName
-          type: 'input',
-          name: 'projectName',
-          message: '项目名称',
-          initial: 'base-demo',
-        })
-      ).projectName
 
-  const targetPath = path.join(cwd, projectName)
-  const spinner = ora()
-  if (fs.existsSync(targetPath)) {
-    spinner.start(`更新已存在的${projectName}项目`)
+const main = async () => {
+  let targetPath = ''
+  let projectName = ''
+  if(fs.existsSync(path.join(cwd, 'package.json'))) {
+    projectName = path.basename(cwd)
+    targetPath = cwd
+    spinner.start(`更新当前项目（${projectName}）`)
     await updateExistProject(targetPath)
   } else {
-    spinner.start(`新建${projectName}项目`)
-    await createNewProject(targetPath)
-    spawn.sync('npm i', { stdio: 'inherit', cwd: targetPath })
+    projectName = argv[0]
+      ? argv[0]
+      : (
+          await prompt({
+            // todo 验证projectName
+            type: 'input',
+            name: 'projectName',
+            message: '项目名称',
+            initial: 'base-demo',
+          })
+        ).projectName
+  
+    targetPath = path.join(cwd, projectName)
+    if (fs.existsSync(targetPath)) {
+      spinner.start(`更新目录下项目${projectName}`)
+      await updateExistProject(targetPath)
+    } else {
+      spinner.start(`新建${projectName}项目`)
+      await createNewProject(targetPath)
+      spawn.sync('npm i', { stdio: 'inherit', cwd: targetPath })
+    }
   }
   spinner.succeed('已完成')
 }
-main().catch(err => console.error('main', err))
+main().catch(err => {
+  console.error('main', err)
+  spinner.fail('失败了，请检查')
+})
 
 // ===================
 //  helper

@@ -1,0 +1,7 @@
+const ora = require('ora')
+const spinner = ora()
+spinner.start('给你新建一个项目，等一哈啊...')
+spinner.succeed('新建好了')
+spinner.start('给你 `npm i` 一下')
+spinner.succeed('好了哈~~')
+spinner.succeed('好了哈22~~')

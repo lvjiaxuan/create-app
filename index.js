@@ -9,6 +9,7 @@ const argv = process.argv.slice(2)
 const { cosmiconfigSync } = require('cosmiconfig')
 const { prompt } = require('enquirer')
 const prettier = require('prettier')
+const spawn = require('cross-spawn')
 const prettierConfig = {
   ...require(path.join(__dirname, 'template/_prettierrc.js')),
   parser: 'babel',
@@ -39,14 +40,16 @@ const main = async () => {
       ).projectName
 
   const targetPath = path.join(cwd, projectName)
+  const spinner = ora()
   if (fs.existsSync(targetPath)) {
-    console.log('更新已有项目')
-    updateExistProject(targetPath)
+    spinner.start(`更新已存在的${projectName}项目`)
+    await updateExistProject(targetPath)
   } else {
-    const spinner = ora('给你新建一个项目，等一哈啊...').start()
+    spinner.start(`新建${projectName}项目`)
     await createNewProject(targetPath)
-    spinner.succeed('好了哈~~')
+    spawn.sync('npm i', { stdio: 'inherit', cwd: targetPath })
   }
+  spinner.succeed('已完成')
 }
 main().catch(err => console.error('main', err))
 
@@ -68,8 +71,6 @@ async function updateExistProject(targetPath) {
   for (const name in explorerSyncs) {
     const module = explorerSyncs[name]
     if (name === 'babel') {
-      console.log('babel')
-
       const babelTargetPath = path.join(targetPath, `babel.config.js`)
       const babelTplPath = path.join(tplPath, `babel.config.js`)
       if (fs.existsSync(babelTargetPath)) {

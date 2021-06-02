@@ -1,11 +1,11 @@
 {
-  "name": "lvjx-app",
+  "name": "@lvjx/create-app",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {},
   "bin": {
-    "lvjx-app": "index.js",
-    "lvjx": "index.js"
+    "create-app": "index.js",
+    "cva": "index.js"
   },
   "keywords": [],
   "file": [
@@ -20,8 +20,9 @@
   "description": "",
   "dependencies": {
     "cosmiconfig": "^7.0.0",
+    "cross-spawn": "^7.0.3",
     "enquirer": "^2.3.6",
-    "npm-check-updates": "^11.5.13",
+    "npm-check-updates": "^11.6.0",
     "ora": "^5.4.0",
     "prettier": "^2.3.0"
   }

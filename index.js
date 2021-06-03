@@ -88,7 +88,7 @@ async function updateExistProject(targetPath) {
         const mergeConfig = deepMerge(require(babelTargetPath), require(babelTplPath))
         fs.writeFileSync(
           path.join(targetPath, `babel.config.js`),
-          prettier.format(`module.exports=${JSON.stringify(mergeConfig, null, 2)}`, prettierConfig)
+          getPrettierCjsStr(mergeConfig, prettierConfig)
         )
       } else {
         copy(babelTplPath, babelTargetPath)
@@ -144,8 +144,33 @@ async function createNewProject(targetPath) {
 }
 
 function getPrettierCjsStr(mergeConfig, prettierConfig) {
+  const main = config =>
+    Object.keys(config).reduce((acc, key) => {
+      const checkValue = config[key]
+      if (
+        Object.prototype.toString.call(checkValue) === '[object Object]' ||
+        Array.isArray(checkValue)
+      ) {
+        acc[key] = main(checkValue)
+      } else {
+        if (
+          [Infinity, -Infinity, NaN].includes(checkValue) ||
+          Object.prototype.toString.call(checkValue) === '[object RegExp]'
+        ) {
+          acc[key] = `#${checkValue.toString()}#`
+        } else if (checkValue === undefined) {
+          acc[key] = '#undefined#'
+        } else {
+          acc[key] = checkValue
+        }
+      }
+      return acc
+    }, config)
 
-  return ''
+  return prettier.format(
+    `module.exports=${JSON.stringify(main(mergeConfig)).replace(/"#|#"/g, '')}`,
+    prettierConfig
+  )
 }
 
 async function getPkgJson(pkg = {}) {
@@ -156,7 +181,7 @@ async function getPkgJson(pkg = {}) {
   })
   Object.keys(upgraded).forEach(dep => {
     if (Object.prototype.hasOwnProperty.call(depsInfo.dependencies, dep)) {
-      depsInfo.dependencies[dep] =  upgraded[dep]
+      depsInfo.dependencies[dep] = upgraded[dep]
     } else if (Object.prototype.hasOwnProperty.call(depsInfo.devDependencies, dep)) {
       depsInfo.devDependencies[dep] = upgraded[dep]
     }

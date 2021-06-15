@@ -26,14 +26,40 @@ const renameFiles = {
   _husky: '.husky',
 }
 
+const spinnerAppend = (() => {
+
+  const appends = []
+  const start = append => {
+    append && appends.push(append)
+    appends.length && spinner.start(`（${appends.length}）` + appends.toString())
+  }
+  const succeed = append => {
+    const idx = appends.findIndex(item => item === append)
+    if(idx > -1) {
+      appends.splice(idx, 1)
+      spinner.succeed(append)
+      start()
+    }
+  }
+  return {
+    // installs,
+    start,
+    succeed,
+  }
+})()
+
 const main = async () => {
   let targetPath = ''
   let projectName = ''
+  let depInstall = false
+  let huskyInstall = false
   if (fs.existsSync(path.join(cwd, 'package.json'))) {
     projectName = path.basename(cwd)
     targetPath = cwd
-    spinner.start(`更新当前项目（${projectName}）`)
-    await updateExistProject(targetPath)
+    spinner.info(`更新当前项目（${projectName}）\n`)
+    const res = await updateExistProject(targetPath)
+    depInstall = res.depInstall
+    huskyInstall = res.huskyInstall
   } else {
     projectName = argv[0]
       ? argv[0]
@@ -49,15 +75,69 @@ const main = async () => {
 
     targetPath = path.join(cwd, projectName)
     if (fs.existsSync(targetPath)) {
-      spinner.start(`更新目录下项目${projectName}`)
-      await updateExistProject(targetPath)
+      spinner.info(`更新目录下项目（${projectName}）\n`)
+      const res = await updateExistProject(targetPath)
+      depInstall = res.depInstall
+      huskyInstall = res.huskyInstall
     } else {
-      spinner.start(`新建${projectName}项目`)
+      depInstall = true
+      huskyInstall = true
+      spinner.info(`新建项目（${projectName}）\n`)
       await createNewProject(targetPath)
     }
   }
-  spawn.sync('npm i', { stdio: 'inherit', cwd: targetPath })
-  spinner.succeed('@lvjx/app 已完成')
+
+  const spawnPromises = []
+  depInstall
+    ? spawnPromises.push(
+        new Promise(resolve => {
+          spinnerAppend.start('npm install')
+          spawn('npm i', { stdio: 'pipe', cwd: targetPath }).on('close', code => {
+            if(code == 0 ) {
+              spinnerAppend.succeed('npm install')
+              resolve()
+            }
+          })
+        })
+      )
+    : spinner.info('No `npm install` required')
+
+  const gitChild = spawn('git status', { stdio: 'pipe', cwd: targetPath })
+  spawnPromises.push(
+    new Promise(resolve => {
+      gitChild.on('close', code => {
+        if(code == 0 ) {
+          spinner.info('git repo exist')
+          resolve()
+        }
+      })
+      gitChild.stderr.on('data', () =>
+        spawn('git init', { stdio: 'pipe', cwd: targetPath }).on('close', code => {
+          if(code == 0 ) {
+            spinner.succeed('git init')
+            resolve()
+          }
+        })
+      )
+    }).then(() =>
+      huskyInstall
+        ? new Promise(resolve => {
+            spinnerAppend.start('husky install')
+            spawn('npx husky install', { stdio: 'pipe', cwd: targetPath }).on('close', code => {
+              if(code == 0 ) {
+                spinnerAppend.succeed('husky install')
+                resolve()
+              }
+            })
+          })
+        : spinner.info('No `husky install` required')
+    )
+  )
+
+  Promise.all(spawnPromises).then(() => {
+    console.log()
+    spinner.succeed('@lvjx/app 已完成')
+  })
 }
 main().catch(err => {
   console.error('main', err)
@@ -80,6 +160,7 @@ async function updateExistProject(targetPath) {
     eslint: cosmiconfigSync('eslint').search(targetPath),
   }
   for (const name in explorerSyncs) {
+    spinner.start(name + ' config')
     const module = explorerSyncs[name]
     if (name === 'babel') {
       const babelTargetPath = path.join(targetPath, `babel.config.js`)
@@ -111,22 +192,49 @@ async function updateExistProject(targetPath) {
         ? mergeIgnore(ignoreTplPath, ignoreTargetPath)
         : copy(ignoreTplPath, ignoreTargetPath)
     }
+    spinner.succeed(name + ' config')
   }
 
+  let huskyInstall = false
   if (!fs.existsSync(path.join(targetPath, '.husky'))) {
+    spinner.start('husky config')
+    huskyInstall = true
     copy(path.join(tplPath, '_husky'), path.join(targetPath, '.husky'))
+    spinner.succeed('husky config')
   }
 
   let pkg = {}
+  let depInstall = false
+  const newPkg = await getPkgJson(pkg)
   if (fs.existsSync(path.join(targetPath, 'package.json'))) {
     pkg = require(path.join(targetPath, 'package.json'))
+    pkg.dependencies = pkg.dependencies ?? {}
+    pkg.devDependencies = pkg.devDependencies ?? {}
+    for (const name in newPkg.dependencies) {
+      if (pkg.dependencies[name] != newPkg.dependencies[name]) {
+        console.log(pkg.dependencies.name, newPkg.dependencies[name])
+        depInstall = true
+        break
+      }
+    }
+
+    if (!depInstall) {
+      for (const name in newPkg.devDependencies) {
+        if (pkg.dependencies.name != newPkg.dependencies[name]) {
+          depInstall = true
+          break
+        }
+      }
+    }
   }
 
   fs.writeFileSync(
     // 涉及网络异步io
     path.join(targetPath, 'package.json'),
-    JSON.stringify(await getPkgJson(pkg), null, 2)
+    JSON.stringify(newPkg, null, 2)
   )
+
+  return { depInstall, huskyInstall }
 }
 
 /**
@@ -134,8 +242,10 @@ async function updateExistProject(targetPath) {
  * @param {string} targetPath 目标项目位置
  */
 async function createNewProject(targetPath) {
+  spinner.start('模板文件复制')
   fs.mkdirSync(targetPath, { recursive: true })
   copyTemplates(targetPath) // 极快的本地io
+  spinner.succeed('模板文件复制')
   fs.writeFileSync(
     // 涉及网络异步io
     path.join(targetPath, 'package.json'),
@@ -174,11 +284,13 @@ function getPrettierCjsStr(mergeConfig, prettierConfig) {
 }
 
 async function getPkgJson(pkg = {}) {
+  spinnerAppend.start('npm check updates')
   const upgraded = await ncu.run({
     // Pass any cli option
     packageFile: ncuDepsPath,
     upgrade: false,
   })
+  spinnerAppend.succeed('npm check updates')
   Object.keys(upgraded).forEach(dep => {
     if (Object.prototype.hasOwnProperty.call(depsInfo.dependencies, dep)) {
       depsInfo.dependencies[dep] = upgraded[dep]
@@ -218,17 +330,15 @@ async function getPkgJson(pkg = {}) {
 
 function copy(src, dest) {
   const stat = fs.statSync(src)
+  const srcBasename = path.basename(src)
+  const renameDest = path.format({
+    dir: path.dirname(dest),
+    base: renameFiles[srcBasename] ? renameFiles[srcBasename] : srcBasename,
+  })
   if (stat.isDirectory()) {
-    copyDir(src, dest)
+    copyDir(src, renameDest)
   } else {
-    const srcBasename = path.basename(src)
-    fs.copyFileSync(
-      src,
-      path.format({
-        dir: path.dirname(dest),
-        base: renameFiles[srcBasename] ? renameFiles[srcBasename] : srcBasename,
-      })
-    )
+    fs.copyFileSync(src, renameDest)
   }
 }
 

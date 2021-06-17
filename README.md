@@ -15,7 +15,7 @@ npm init @lvjx/app
 # todo
 
 - [x] dependencies没变就不ncu
-- [ ] 减少tpl copy
-- [ ] git cz
+- [ ] ~~减少tpl copy（必要性不大，不做了）~~
+- [ ] git cz（custom）
 - [ ] auto publish
 - [ ] git init

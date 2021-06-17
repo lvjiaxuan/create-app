@@ -90,6 +90,22 @@ module.exports = async targetPath => {
   return { depInstall, huskyInstall }
 }
 
+function updateRc() {
+
+}
+
+function updateHusky() {
+
+}
+
+function updateDep() {
+
+}
+
+function updateCz() {
+  
+}
+
 function getPrettierCjsStr(mergeConfig, prettierConfig) {
   const main = config =>
     Object.keys(config).reduce((acc, key) => {
@@ -119,7 +135,6 @@ function getPrettierCjsStr(mergeConfig, prettierConfig) {
     prettierConfig
   )
 }
-
 
 function mergeIgnore(ignoreTplPath, ignoreTargetPath) {
   const tplArr = fs

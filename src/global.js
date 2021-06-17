@@ -1,6 +1,7 @@
 const path = require('path')
-
+const spawn = require('cross-spawn')
 const spinner = require('ora')()
+
 exports.spinner = spinner
 
 exports.renameFiles = {
@@ -21,11 +22,11 @@ exports.spinnerAppend = (() => {
     append && appends.push(append)
     appends.length && spinner.start(`（${appends.length}）` + appends.toString())
   }
-  const succeed = append => {
+  const succeed = (append, showSucceed = true) => {
     const idx = appends.findIndex(item => item === append)
     if (idx > -1) {
       appends.splice(idx, 1)
-      spinner.succeed(append)
+      showSucceed && spinner.succeed(append)
       start()
     }
   }
@@ -68,3 +69,10 @@ exports.prettierConfig = {
   ...require(path.join(__dirname, '../template/_prettierrc.js')),
   parser: 'babel',
 }
+
+exports.loadGlobalCZ = () =>
+  new Promise(resolve =>
+    spawn('npm ls commitizen --depth 0 -g', { stdio: 'pipe' }).stdout.on('data', data =>
+      resolve(/\scommitizen@\d\.\d\.\d/.test(data.toString()))
+    )
+  )

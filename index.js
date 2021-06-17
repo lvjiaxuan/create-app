@@ -2,13 +2,13 @@
 
 const fs = require('fs')
 const path = require('path')
-const { prompt } = require('enquirer')
 const spawn = require('cross-spawn')
 const cwd = process.cwd()
 const argv = process.argv.slice(2)
 const createNewProject = require('./src/createNewProject')
 const updateExistProject = require('./src/updateExistProject')
-const { spinner, spinnerAppend } = require('./src/global')
+const { prompt } = require('enquirer')
+const { spinner, spinnerAppend, loadGlobalCZ } = require('./src/global')
 
 const main = async () => {
   let targetPath = ''
@@ -96,11 +96,35 @@ const main = async () => {
     )
   )
 
+  spinnerAppend.start('global commitizen check')
+  console.log(11)
+  spawnPromises.push(
+    new Promise(resolve =>
+      loadGlobalCZ().then(hasCZ => {
+        console.log({ hasCZ })
+        spinnerAppend.succeed('global commitizen check')
+        if (hasCZ) {
+          spinner.info('exist global commitizen')
+          resolve()
+        } else {
+          spinnerAppend.start('global commitizen install')
+          spawn('npm i commitizen -g', { stdio: 'pipe' }).on('close', code => {
+            if (code == 0) {
+              spinnerAppend.succeed('global commitizen install')
+              resolve()
+            }
+          })
+        }
+      })
+    )
+  )
+
   Promise.all(spawnPromises).then(() => {
     console.log()
     spinner.succeed('@lvjx/app 已完成')
   })
 }
+
 main().catch(err => {
   console.error('main', err)
   spinner.fail('失败了，请检查')

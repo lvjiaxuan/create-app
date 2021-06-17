@@ -2,7 +2,9 @@
   "name": "@lvjx/create-app",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "lint": "eslint ./src"
+  },
   "bin": {
     "create-app": "index.js",
     "cva": "index.js"
@@ -30,5 +32,8 @@
     "npm-check-updates": "^11.6.0",
     "ora": "^5.4.0",
     "prettier": "^2.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.28.0"
   }
 }

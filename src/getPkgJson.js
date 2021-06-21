@@ -49,7 +49,7 @@ module.exports = async (pkg = {}, passNCU = false) => {
       },
     },
     ...pkg,
-    dependencies: passNCU ? (pkg.dependencies ?? { vue: '^2.6.14' }) : deepMerge(pkg.dependencies, depsInfo.dependencies),
+    dependencies: passNCU ? (pkg.dependencies ?? {}) : deepMerge(pkg.dependencies, depsInfo.dependencies),
     devDependencies: passNCU ? (pkg.devDependencies ?? {}) : deepMerge(pkg.devDependencies, depsInfo.devDependencies),
   }
 }

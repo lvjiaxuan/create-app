@@ -16,7 +16,7 @@ module.exports = async targetPath => {
   fs.writeFileSync(
     // 涉及网络异步io
     path.join(targetPath, 'package.json'),
-    JSON.stringify(await getPkgJson({}, true), null, 2)
+    JSON.stringify(await getPkgJson(), null, 2)
   )
 }
 

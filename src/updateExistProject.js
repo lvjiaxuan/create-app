@@ -15,7 +15,7 @@ const {
 module.exports = async targetPath => {
   updateRc(targetPath)
   const huskyInstall = updateHusky(targetPath)
-  updateCz(targetPath)
+  updateCZ(targetPath)
   updateGitIgnore(targetPath)
   const depInstall = await updateDep(targetPath)
   return { depInstall, huskyInstall }
@@ -47,7 +47,7 @@ function updateRc(targetPath) {
         rcModule && rcModule.filepath && fs.unlinkSync(rcModule.filepath)
         copy(path.join(tplPath, `_${name}rc.js`), path.join(targetPath, `.${name}rc.js`))
       } else {
-        const mergeConfig = deepMerge(rcModule.config, require(path.join(tplPath, `_${name}rc.js`)))
+        const mergeConfig = deepMerge(require(path.join(tplPath, `_${name}rc.js`)), rcModule.config)
         fs.writeFileSync(
           path.join(targetPath, `.${name}rc.js`),
           getPrettierCjsStr(mergeConfig, prettierConfig)
@@ -77,12 +77,10 @@ function updateHusky(targetPath) {
 
 async function updateDep(targetPath) {
   let depInstall = false
-  let pkg = {}
-  const newPkg = await getPkgJson(pkg)
+  let newPkg = {}
   if (fs.existsSync(path.join(targetPath, 'package.json'))) {
-    pkg = require(path.join(targetPath, 'package.json'))
-    pkg.dependencies = pkg.dependencies ?? {}
-    pkg.devDependencies = pkg.devDependencies ?? {}
+    const pkg = require(path.join(targetPath, 'package.json'))
+    newPkg = await getPkgJson(pkg)
     for (const name in newPkg.dependencies) {
       if (pkg.dependencies[name] != newPkg.dependencies[name]) {
         depInstall = true
@@ -98,18 +96,17 @@ async function updateDep(targetPath) {
         }
       }
     }
+    fs.writeFileSync(
+      // 涉及网络异步io
+      path.join(targetPath, 'package.json'),
+      JSON.stringify(newPkg, null, 2)
+    )
   }
-
-  fs.writeFileSync(
-    // 涉及网络异步io
-    path.join(targetPath, 'package.json'),
-    JSON.stringify(newPkg, null, 2)
-  )
 
   return depInstall
 }
 
-function updateCz(targetPath) {
+function updateCZ(targetPath) {
   spinner.start('commitizen config')
   !fs.existsSync(path.join(targetPath, '.cz-simple.js')) &&
     copy(path.join(tplPath, '_cz-simple.js'), path.join(targetPath, '.cz-simple.js'))

@@ -1,6 +1,5 @@
 const path = require('path')
 const fs = require('fs')
-const spawn = require('cross-spawn')
 const prettier = require('prettier')
 const spinner = require('ora')()
 
@@ -101,13 +100,6 @@ exports.getPrettierCjsStr = (obj, prettierCustomConfig = {}) => {
     ...prettierCustomConfig,
   })
 }
-
-exports.loadGlobalCZ = () =>
-  new Promise(resolve =>
-    spawn('npm ls commitizen --depth 0 -g', { stdio: 'pipe' }).stdout.on('data', data =>
-      resolve(/\scommitizen@\d\.\d\.\d/.test(data.toString()))
-    )
-  )
 
 exports.mergeIgnore = (ignoreTplPath, ignoreTargetPath) => {
   const tplArr = fs

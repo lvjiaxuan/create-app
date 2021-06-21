@@ -21,6 +21,11 @@
     "registry": "https://registry.npmjs.org/",
     "access": "public"
   },
+  "config": {
+    "commitizen": {
+      "path": "./template/_cz-simple"
+    }
+  },
   "author": "lvjiaxuan",
   "email": "471501748@qq.com",
   "license": "ISC",

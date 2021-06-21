@@ -19,3 +19,5 @@ npm init @lvjx/app
 - [ ] git cz（custom）
 - [ ] auto publish
 - [ ] git init
+- [ ] 增加可选项
+- [ ] test

@@ -1,12 +1,27 @@
 const fs = require('fs')
 const path = require('path')
-const prettier = require('prettier')
 const copy = require('./copy')
 const getPkgJson = require('./getPkgJson')
 const { cosmiconfigSync } = require('cosmiconfig')
-const { deepMerge, prettierConfig, spinner, tplPath } = require('./global')
+const {
+  deepMerge,
+  spinner,
+  tplPath,
+  getPrettierCjsStr,
+  mergeIgnore,
+  prettierConfig,
+} = require('./global')
 
 module.exports = async targetPath => {
+  updateRc(targetPath)
+  const huskyInstall = updateHusky(targetPath)
+  updateCz(targetPath)
+  updateGitIgnore(targetPath)
+  const depInstall = await updateDep(targetPath)
+  return { depInstall, huskyInstall }
+}
+
+function updateRc(targetPath) {
   const explorerSyncs = {
     babel: cosmiconfigSync('babel').search(targetPath),
     prettier: cosmiconfigSync('prettier').search(targetPath),
@@ -47,7 +62,9 @@ module.exports = async targetPath => {
     }
     spinner.succeed(name + ' config')
   }
+}
 
+function updateHusky(targetPath) {
   let huskyInstall = false
   if (!fs.existsSync(path.join(targetPath, '.husky'))) {
     spinner.start('husky config')
@@ -55,9 +72,12 @@ module.exports = async targetPath => {
     copy(path.join(tplPath, '_husky'), path.join(targetPath, '.husky'))
     spinner.succeed('husky config')
   }
+  return huskyInstall
+}
 
-  let pkg = {}
+async function updateDep(targetPath) {
   let depInstall = false
+  let pkg = {}
   const newPkg = await getPkgJson(pkg)
   if (fs.existsSync(path.join(targetPath, 'package.json'))) {
     pkg = require(path.join(targetPath, 'package.json'))
@@ -65,7 +85,6 @@ module.exports = async targetPath => {
     pkg.devDependencies = pkg.devDependencies ?? {}
     for (const name in newPkg.dependencies) {
       if (pkg.dependencies[name] != newPkg.dependencies[name]) {
-        console.log(pkg.dependencies.name, newPkg.dependencies[name])
         depInstall = true
         break
       }
@@ -87,71 +106,20 @@ module.exports = async targetPath => {
     JSON.stringify(newPkg, null, 2)
   )
 
-  return { depInstall, huskyInstall }
+  return depInstall
 }
 
-function updateRc() {
-
+function updateCz(targetPath) {
+  spinner.start('commitizen config')
+  !fs.existsSync(path.join(targetPath, '.cz-simple.js')) &&
+    copy(path.join(tplPath, '_cz-simple.js'), path.join(targetPath, '.cz-simple.js'))
+  spinner.succeed('commitizen config')
 }
 
-function updateHusky() {
-
-}
-
-function updateDep() {
-
-}
-
-function updateCz() {
-  
-}
-
-function getPrettierCjsStr(mergeConfig, prettierConfig) {
-  const main = config =>
-    Object.keys(config).reduce((acc, key) => {
-      const checkValue = config[key]
-      if (
-        Object.prototype.toString.call(checkValue) === '[object Object]' ||
-        Array.isArray(checkValue)
-      ) {
-        acc[key] = main(checkValue)
-      } else {
-        if (
-          [Infinity, -Infinity, NaN].includes(checkValue) ||
-          Object.prototype.toString.call(checkValue) === '[object RegExp]'
-        ) {
-          acc[key] = `#${checkValue.toString()}#`
-        } else if (checkValue === undefined) {
-          acc[key] = '#undefined#'
-        } else {
-          acc[key] = checkValue
-        }
-      }
-      return acc
-    }, config)
-
-  return prettier.format(
-    `module.exports=${JSON.stringify(main(mergeConfig)).replace(/"#|#"/g, '')}`,
-    prettierConfig
-  )
-}
-
-function mergeIgnore(ignoreTplPath, ignoreTargetPath) {
-  const tplArr = fs
-    .readFileSync(ignoreTplPath, { encoding: 'utf8' })
-    .split(/\n|\r/)
-    .filter(i => i)
-  const targetArr = fs
-    .readFileSync(ignoreTargetPath, { encoding: 'utf8' })
-    .split(/\n|\r/)
-    .filter(i => i)
-  const removalDuplicates = [...new Set([...tplArr, ...targetArr])].reduce((acc, item) => {
-    acc += item + '\n'
-    return acc
-  }, '')
-  fs.writeFileSync(
-    // 涉及网络异步io
-    ignoreTargetPath,
-    removalDuplicates
-  )
+function updateGitIgnore(targetPath) {
+  spinner.start('gitignore file')
+  !fs.existsSync(path.join(targetPath, '.gitignore'))
+    ? copy(path.join(tplPath, '_gitignore'), path.join(targetPath, '.gitignore'))
+    : mergeIgnore(path.join(tplPath, '_gitignore'), path.join(targetPath, '.gitignore'))
+  spinner.succeed('gitignore file')
 }

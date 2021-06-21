@@ -8,7 +8,7 @@ const argv = process.argv.slice(2)
 const createNewProject = require('./src/createNewProject')
 const updateExistProject = require('./src/updateExistProject')
 const { prompt } = require('enquirer')
-const { spinner, spinnerAppend, loadGlobalCZ } = require('./src/global')
+const { spinner, spinnerAll, loadGlobalCZ } = require('./src/global')
 
 const main = async () => {
   let targetPath = ''
@@ -49,68 +49,74 @@ const main = async () => {
     }
   }
 
+  /**
+   * 以下是一些并发的异步任务
+   * 
+   * 使用 spinnerAll 保证 start 运行
+   */
+
   const spawnPromises = []
   depInstall
     ? spawnPromises.push(
         new Promise(resolve => {
-          spinnerAppend.start('npm install')
+          spinnerAll.start('npm install')
           spawn('npm i', { stdio: 'pipe', cwd: targetPath }).on('close', code => {
             if (code == 0) {
-              spinnerAppend.succeed('npm install')
+              spinnerAll.succeed('npm install')
               resolve()
             }
           })
         })
       )
-    : spinner.info('No `npm install` required')
+    : spinnerAll.info('No `npm install` required')
 
   const gitChild = spawn('git status', { stdio: 'pipe', cwd: targetPath })
   spawnPromises.push(
     new Promise(resolve => {
       gitChild.on('close', code => {
         if (code == 0) {
-          spinner.info('git repo exist')
+          spinnerAll.info('git repo exists')
           resolve()
         }
       })
-      gitChild.stderr.on('data', () =>
+      gitChild.stderr.on('data', () => {
+        spinnerAll.start('git init')
         spawn('git init', { stdio: 'pipe', cwd: targetPath }).on('close', code => {
           if (code == 0) {
-            spinner.succeed('git init')
+            spinnerAll.succeed('git init')
             resolve()
           }
         })
+      }
       )
     }).then(() =>
       huskyInstall
         ? new Promise(resolve => {
-            spinnerAppend.start('husky install')
+            spinnerAll.start('husky install')
             spawn('npx husky install', { stdio: 'pipe', cwd: targetPath }).on('close', code => {
               if (code == 0) {
-                spinnerAppend.succeed('husky install')
+                spinnerAll.succeed('husky install')
                 resolve()
               }
             })
           })
-        : spinner.info('No `husky install` required')
+        : spinnerAll.info('No `husky install` required')
     )
   )
 
-  spinnerAppend.start('global commitizen check')
-  console.log(11)
+  spinnerAll.start('global commitizen check')
   spawnPromises.push(
     new Promise(resolve =>
       loadGlobalCZ().then(hasCZ => {
-        console.log({ hasCZ })
-        spinnerAppend.succeed('global commitizen check')
+        spinnerAll.succeed('global commitizen check', false)
+        spinnerAll.info(`global commitizen ${hasCZ ? 'exists' : 'not found'}`)
         if (hasCZ) {
-          spinner.info('exist global commitizen')
           resolve()
         } else {
-          spinnerAppend.start('global commitizen install')
+          spinnerAll.start('global commitizen install')
           spawn('npm i commitizen -g', { stdio: 'pipe' }).on('close', code => {
             if (code == 0) {
-              spinnerAppend.succeed('global commitizen install')
+              spinnerAll.succeed('global commitizen install')
               resolve()
             }
           })

@@ -2,16 +2,16 @@ const path = require('path')
 const ncu = require('npm-check-updates')
 const ncuDepsPath = path.join(__dirname, '../deps_json/index.json')
 const depsInfo = require(ncuDepsPath)
-const { spinnerAppend, deepMerge } = require('./global')
+const { spinnerAll, deepMerge } = require('./global')
 
-module.exports = async (pkg = {}) => {
-  spinnerAppend.start('npm check updates')
-  const upgraded = await ncu.run({
+module.exports = async (pkg = {}, passNCU = false) => {
+  spinnerAll.start('(dev)dependencies updates')
+  const upgraded = passNCU ? {} : await ncu.run({
     // Pass any cli option
     packageFile: ncuDepsPath,
     upgrade: false,
   })
-  spinnerAppend.succeed('npm check updates')
+  spinnerAll.succeed('(dev)dependencies updates')
   Object.keys(upgraded).forEach(dep => {
     if (Object.prototype.hasOwnProperty.call(depsInfo.dependencies, dep)) {
       depsInfo.dependencies[dep] = upgraded[dep]
@@ -30,8 +30,8 @@ module.exports = async (pkg = {}) => {
     email: '',
     homepage: 'https://github.com',
     repository: {
-      type: 'git or svn',
-      url: '',
+      type: 'git',
+      url: 'https://github.com',
     },
     publishConfig: {
       tag: 'latest',
@@ -49,7 +49,7 @@ module.exports = async (pkg = {}) => {
       },
     },
     ...pkg,
-    dependencies: deepMerge(pkg.dependencies, depsInfo.dependencies),
-    devDependencies: deepMerge(pkg.devDependencies, depsInfo.devDependencies),
+    dependencies: passNCU ? (pkg.dependencies ?? { vue: '^2.6.14' }) : deepMerge(pkg.dependencies, depsInfo.dependencies),
+    devDependencies: passNCU ? (pkg.devDependencies ?? {}) : deepMerge(pkg.devDependencies, depsInfo.devDependencies),
   }
 }

@@ -1,5 +1,7 @@
 const path = require('path')
+const fs = require('fs')
 const spawn = require('cross-spawn')
+const prettier = require('prettier')
 const spinner = require('ora')()
 
 exports.spinner = spinner
@@ -16,25 +18,25 @@ exports.renameFiles = {
 
 exports.tplPath = path.join(__dirname, '../template')
 
-exports.spinnerAppend = (() => {
-  const appends = []
-  const start = append => {
-    append && appends.push(append)
-    appends.length && spinner.start(`（${appends.length}）` + appends.toString())
-  }
-  const succeed = (append, showSucceed = true) => {
-    const idx = appends.findIndex(item => item === append)
+exports.spinnerAll = (() => ({
+  appends: [],
+  start(append) {
+    append && this.appends.push(append)
+    this.appends.length && spinner.start(`（${this.appends.length}）` + this.appends.toString())
+  },
+  succeed(append, showSucceed = true) {
+    const idx = this.appends.findIndex(item => item === append)
     if (idx > -1) {
-      appends.splice(idx, 1)
+      this.appends.splice(idx, 1)
       showSucceed && spinner.succeed(append)
-      start()
+      this.start()
     }
+  },
+  info(text) {
+    spinner.info(text)
+    this.start()
   }
-  return {
-    start,
-    succeed,
-  }
-})()
+}))()
 
 const deepMerge = (target, ...args) => {
   return args.reduce((acc, mergeObj) => {
@@ -65,9 +67,39 @@ const deepMerge = (target, ...args) => {
 }
 exports.deepMerge = deepMerge
 
-exports.prettierConfig = {
+const prettierConfig = {
   ...require(path.join(__dirname, '../template/_prettierrc.js')),
   parser: 'babel',
+}
+exports.prettierConfig = prettierConfig
+exports.getPrettierCjsStr = (obj, prettierCustomConfig = {}) => {
+  const main = config =>
+    Object.keys(config).reduce((acc, key) => {
+      const checkValue = config[key]
+      if (
+        Object.prototype.toString.call(checkValue) === '[object Object]' ||
+        Array.isArray(checkValue)
+      ) {
+        acc[key] = main(checkValue)
+      } else {
+        if (
+          [Infinity, -Infinity, NaN].includes(checkValue) ||
+          Object.prototype.toString.call(checkValue) === '[object RegExp]'
+        ) {
+          acc[key] = `#${checkValue.toString()}#`
+        } else if (checkValue === undefined) {
+          acc[key] = '#undefined#'
+        } else {
+          acc[key] = checkValue
+        }
+      }
+      return acc
+    }, config)
+
+  return prettier.format(`module.exports=${JSON.stringify(main(obj)).replace(/"#|#"/g, '')}`, {
+    ...prettierConfig,
+    ...prettierCustomConfig,
+  })
 }
 
 exports.loadGlobalCZ = () =>
@@ -76,3 +108,19 @@ exports.loadGlobalCZ = () =>
       resolve(/\scommitizen@\d\.\d\.\d/.test(data.toString()))
     )
   )
+
+exports.mergeIgnore = (ignoreTplPath, ignoreTargetPath) => {
+  const tplArr = fs
+    .readFileSync(ignoreTplPath, { encoding: 'utf8' })
+    .split(/\n|\r/)
+    .filter(i => i)
+  const targetArr = fs
+    .readFileSync(ignoreTargetPath, { encoding: 'utf8' })
+    .split(/\n|\r/)
+    .filter(i => i)
+  const removalDuplicates = [...new Set([...tplArr, ...targetArr])].reduce((acc, item) => {
+    acc += item + '\n'
+    return acc
+  }, '')
+  fs.writeFileSync(ignoreTargetPath, removalDuplicates)
+}

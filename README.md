@@ -16,7 +16,7 @@ npm init @lvjx/app
 
 - [x] dependencies没变就不ncu
 - [ ] ~~减少tpl copy（必要性不大，不做了）~~
-- [ ] git cz（custom）
+- [x] git cz
 - [ ] auto publish
 - [ ] git init
 - [ ] 增加可选项 commander

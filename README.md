@@ -18,7 +18,7 @@ npm init @lvjx/app
 - [ ] ~~减少tpl copy（必要性不大，不做了）~~
 - [x] git cz
 - [ ] auto publish
-- [ ] git init
+- [x] git init
 - [ ] 增加可选项 commander
 - [ ] test
 - [ ] createNew fail and rm targetPath

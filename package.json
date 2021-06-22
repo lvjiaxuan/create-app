@@ -1,13 +1,12 @@
 {
   "name": "@lvjx/create-app",
-  "version": "1.0.0",
+  "version": "1.1g.0",
   "main": "index.js",
   "scripts": {
     "lint": "eslint ./src"
   },
   "bin": {
-    "create-app": "index.js",
-    "cva": "index.js"
+    "i": "index.js"
   },
   "keywords": [],
   "file": [

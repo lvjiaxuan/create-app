@@ -21,4 +21,3 @@ npm init @lvjx/app
 - [x] git init
 - [ ] 增加可选项 commander
 - [ ] test
-- [ ] createNew fail and rm targetPath

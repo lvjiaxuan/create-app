@@ -21,3 +21,4 @@ npm init @lvjx/app
 - [x] git init
 - [ ] 增加可选项 commander
 - [ ] test
+- [x] travisCI

@@ -15,14 +15,14 @@ module.exports = ({
   targetPath = targetPathParam
 
   // all concurrency
-  installDel()
+  installDep()
   gitStatus()
   globalCZStatus()
 
   return spawnPromises
 }
 
-function installDel() {
+function installDep() {
   depInstall
     ? spawnPromises.push(
         new Promise(resolve => {

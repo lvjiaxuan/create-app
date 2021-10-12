@@ -2,33 +2,31 @@
 
 const fs = require('fs')
 const path = require('path')
+const prompts = require('prompts')
 const cwd = process.cwd()
-const argv = process.argv.slice(2)
+const argv = process.argv.slice(process.argv[1].includes('@lvjx\\create-app\\main.js') ? 3 : 2)
 const createNewProject = require('./src/createNewProject')
 const updateExistProject = require('./src/updateExistProject')
 const spawnAll = require('./src/spawnAll')
-const { prompt } = require('enquirer')
 const { spinner } = require('./src/global')
 
 const main = async () => {
-  let targetPath = ''
-  let projectName = ''
-  let depInstall = false
-  let huskyInstall = false
+  let targetPath = '' // 项目绝对路径
+  let projectName = '' // 项目名
+  let initProjectType = '' // 如何处理项目
+
+  // 1. 定位位置
   if (fs.existsSync(path.join(cwd, 'package.json'))) {
     projectName = path.basename(cwd)
     targetPath = cwd
     spinner.info(`更新当前项目 · ${projectName}\n`)
-    const res = await updateExistProject(targetPath)
-    depInstall = res.depInstall
-    huskyInstall = res.huskyInstall
+    initProjectType = 'update'
   } else {
     projectName = argv[0]
       ? argv[0]
       : (
-          await prompt({
-            // todo 验证projectName
-            type: 'input',
+          await prompts({
+            type: 'text',
             name: 'projectName',
             message: '项目名称',
             initial: 'base-demo',
@@ -38,26 +36,35 @@ const main = async () => {
     targetPath = path.join(cwd, projectName)
     if (fs.existsSync(targetPath)) {
       spinner.info(`更新目录下项目 · ${projectName} \n`)
-      const res = await updateExistProject(targetPath)
-      depInstall = res.depInstall
-      huskyInstall = res.huskyInstall
+      initProjectType = 'update'
     } else {
-      depInstall = true
-      huskyInstall = true
       spinner.info(`新建项目 · ${projectName} \n`)
-      await createNewProject(targetPath)
+      initProjectType = 'create'
     }
   }
 
-  Promise.all(spawnAll({ depInstall, huskyInstall, targetPath })).then(() => {
-    console.log()
-    spinner.succeed('@lvjx/app 已完成')
+  // 2. 选择要安装的工具
+  const { tools } = await prompts({
+    type: 'multiselect',
+    name: 'tools',
+    message: '选择要安装的工具',
+    instructions: false,
+    hint: '- Space to select. Return to submit',
+    choices: [
+      { title: 'husky: husky + lint-staged', value: 'husky', selected: true },
+      { title: 'prettier: prettier', value: 'prettier' },
+      { title: 'eslint: eslint', value: 'eslint' },
+      { title: 'babel: @babel/preset-env + @babel/plugin-transform-runtime + @babel/runtime-corejs3', value: 'babel' },
+      { title: 'commitizen: commitizen with customizable config', value: 'commitizen' },
+    ],
   })
+
+  // 3. 开始注入项目文件
+  if(initProjectType) {
+    createNewProject(targetPath, tools)
+  } else {
+
+  }
 }
 
-main().catch(err => {
-  console.error('main', err)
-  console.log()
-  spinner.fail('失败了，请检查')
-  // todo rm targetPath
-})
+main().catch(e => console.log(e.toString()))

@@ -1,20 +1,14 @@
 const path = require('path')
 const fs = require('fs')
-const { renameFiles } = require('./global')
 
 module.exports = copy
 
 function copy(src, dest) {
   const stat = fs.statSync(src)
-  const srcBasename = path.basename(src)
-  const renameDest = path.format({
-    dir: path.dirname(dest),
-    base: renameFiles[srcBasename] ? renameFiles[srcBasename] : srcBasename,
-  })
   if (stat.isDirectory()) {
-    copyDir(src, renameDest)
+    copyDir(src, dest)
   } else {
-    fs.copyFileSync(src, renameDest)
+    fs.copyFileSync(src, dest)
   }
 }
 

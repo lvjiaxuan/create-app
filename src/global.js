@@ -2,6 +2,7 @@ const path = require('path')
 const fs = require('fs')
 const prettier = require('prettier')
 const spinner = require('ora')()
+const axios = require('axios')
 
 exports.spinner = spinner
 
@@ -34,7 +35,7 @@ exports.spinnerAll = (() => ({
   info(text) {
     spinner.info(text)
     this.start()
-  }
+  },
 }))()
 
 const deepMerge = (target, ...args) => {
@@ -67,7 +68,7 @@ const deepMerge = (target, ...args) => {
 exports.deepMerge = deepMerge
 
 const prettierConfig = {
-  ...require(path.join(__dirname, '../template/_prettierrc.js')),
+  ...require(path.join(__dirname, '../template/prettier/.prettierrc.js')),
   parser: 'babel',
 }
 exports.prettierConfig = prettierConfig
@@ -75,10 +76,7 @@ exports.getPrettierCjsStr = (obj, prettierCustomConfig = {}) => {
   const main = config =>
     Object.keys(config).reduce((acc, key) => {
       const checkValue = config[key]
-      if (
-        Object.prototype.toString.call(checkValue) === '[object Object]' ||
-        Array.isArray(checkValue)
-      ) {
+      if (Object.prototype.toString.call(checkValue) === '[object Object]' || Array.isArray(checkValue)) {
         acc[key] = main(checkValue)
       } else {
         if (
@@ -116,3 +114,10 @@ exports.mergeIgnore = (ignoreTplPath, ignoreTargetPath) => {
   }, '')
   fs.writeFileSync(ignoreTargetPath, removalDuplicates)
 }
+
+exports.getLatestVersion = pkgName =>
+  axios
+    .get(`https://registry.npmmirror.com/${pkgName}/latest`, {
+      headers: { 'content-type': 'application/json' },
+    })
+    .then(res => res.data.version)

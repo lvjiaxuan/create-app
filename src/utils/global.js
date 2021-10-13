@@ -6,18 +6,6 @@ const axios = require('axios')
 
 exports.spinner = spinner
 
-exports.renameFiles = {
-  _gitignore: '.gitignore',
-  _eslintignore: '.eslintignore',
-  '_eslintrc.js': '.eslintrc.js',
-  _prettierignore: '.prettierignore',
-  '_prettierrc.js': '.prettierrc.js',
-  _husky: '.husky',
-  '_cz-simple.js': '.cz-simple.js',
-}
-
-exports.tplPath = path.join(__dirname, '../template')
-
 exports.spinnerAll = (() => ({
   appends: [],
   start(append) {
@@ -68,7 +56,7 @@ const deepMerge = (target, ...args) => {
 exports.deepMerge = deepMerge
 
 const prettierConfig = {
-  ...require(path.join(__dirname, '../template/prettier/.prettierrc.js')),
+  ...require(path.join(__dirname, '../tools/prettier/.prettierrc.js')),
   parser: 'babel',
 }
 exports.prettierConfig = prettierConfig

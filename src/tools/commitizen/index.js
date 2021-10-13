@@ -1,10 +1,13 @@
 const path = require('path')
-const copy = require('./../../src/copy')
-const { spinnerAll, getLatestVersion } = require('./../../src/global')
+const copy = require('./../../utils/copy')
+const { spinnerAll, getLatestVersion } = require('./../../utils/global')
 
 module.exports = async targetPath => {
   spinnerAll.start('commitizen')
   copy(path.join(__dirname, '.cz-simple.js'), path.join(targetPath, '.cz-simple.js'))
+
+  const commitizenVersion = await getLatestVersion('commitizen')
+
   spinnerAll.succeed('commitizen')
 
   return {
@@ -18,7 +21,7 @@ module.exports = async targetPath => {
         },
       },
       devDependencies: {
-        commitizen: `^${await getLatestVersion('commitizen')}`,
+        commitizen: `^${commitizenVersion}`,
       },
     },
   }

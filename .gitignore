@@ -1,6 +1,4 @@
 node_modules
 dist
 .vscode
-./template/_husky/_/husky.sh
-./template/_husky/_gitignore
 package-lock.json

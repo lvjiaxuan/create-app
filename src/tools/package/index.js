@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const spawn = require('cross-spawn')
-const { spinnerAll } = require('./../../src/global')
+const { spinnerAll } = require('./../../utils/global')
 
 module.exports = async (targetPath, pkg = {}) =>
   new Promise(resolve => {

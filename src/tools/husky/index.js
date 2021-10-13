@@ -1,5 +1,5 @@
 const spawn = require('cross-spawn')
-const { spinnerAll, getLatestVersion } = require('./../../src/global')
+const { spinnerAll, getLatestVersion } = require('./../../utils/global')
 
 module.exports = async targetPath => {
   spinnerAll.start('husky')

@@ -1,11 +1,10 @@
 const path = require('path')
-const copy = require('./../../src/copy')
-const { spinnerAll, getLatestVersion } = require('./../../src/global')
+const copy = require('./../../utils/copy')
+const { spinnerAll, getLatestVersion } = require('./../../utils/global')
 
 module.exports = async targetPath => {
   spinnerAll.start('babel')
   copy(path.join(__dirname, 'babel.config.js'), path.join(targetPath, 'babel.config.js'))
-  spinnerAll.succeed('babel')
 
   const latestVersions = await Promise.all([
     getLatestVersion('@babel/runtime-corejs3'),
@@ -13,6 +12,8 @@ module.exports = async targetPath => {
     getLatestVersion('@babel/plugin-transform-runtime'),
     getLatestVersion('@babel/preset-env'),
   ])
+
+  spinnerAll.succeed('babel')
 
   return {
     pkg: {
@@ -22,7 +23,7 @@ module.exports = async targetPath => {
       devDependencies: {
         '@babel/core': `^${latestVersions[1]}`,
         '@babel/plugin-transform-runtime': `^${latestVersions[2]}`,
-        '@babel/preset-env': `^${promises[3]}`,
+        '@babel/preset-env': `^${latestVersions[3]}`,
       },
     },
   }

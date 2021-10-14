@@ -26,7 +26,7 @@
   },
   "config": {
     "commitizen": {
-      "path": "./tools/commitizen/.cz-simple"
+      "path": "./src/tools/commitizen/.cz-simple"
     }
   },
   "author": "lvjiaxuan",

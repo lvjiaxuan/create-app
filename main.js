@@ -9,9 +9,13 @@ const pkgVersion = require('./package.json').version
 program.version(pkgVersion, '-v, --version', '输出当前版本').name('lv')
 
 program
-  .command('init [project-name] [tools-name...]')
-  .description('配置一个项目，输入husky、prettier、eslint、babel、cz则注入相应工具文件')
+  .command('init <project-name> [tools-name...]')
+  .description('初始化一个项目；[project-name]：项目名 必填输入；[tools-name]：要按照的工具名，选填，可多选，全量`husky prettier eslint babel cz`')
   .action((projectName, toolsName) => require('./index')(projectName, toolsName))
 
+program
+  .command('add <tools-name...>')
+  .description('配置一个项目，根据当前是否存在项目进行工具安装')
+  .action(toolsName => require('./index')('', toolsName))
 
 program.parse()

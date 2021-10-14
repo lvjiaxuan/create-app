@@ -1,23 +1,28 @@
 # @lvjx/create-app
 
-基础业务集成工具，帮组你创建新项目，同时也可以扩展你的项目。
-# Usage
+一个工程化工具安装的工具，旨在创建新项目或扩展旧项目。
 
-初始化一个项目
+## 用法
+
+初始化一个新项目：
 ```bash
+# 方式1
 npm init @lvjx/app
+
+# 方式2
+npm init @lvjx/create-app -g
+lv init <project-name> [tools-name...]
 ```
 
-使用cli进行增量配置：
+为旧项目添加工具：
 ```bash
 npm i @lvjx/create-app -g
-```
-
-```bash
 lv add <tool-name...>
 ```
 
-# tool-name chosen
+> 根据当前`cwd`是否存在`package.json`来判断是否为项目，若无“项目”，add命令会创建一个
+
+# 可选的工具
 
 - husky: git + husky + lint-staged
 - prettier: prettier
@@ -25,18 +30,19 @@ lv add <tool-name...>
 - babel: @babel/preset-env + @babel/plugin-transform-runtime + @babel/runtime-corejs3
 - commitizen: commitizen with customizable config
 
+> 特点：每个工具都会安装最新的版本号
 
-# Autocomplete
+# 自动安装的
 
-- add more package name
 - git init, include `.gitignore`
-- ncu
+- 添加更多`package.json`字段属性
 
 # notes
 
-- 请按需编辑`_husky/_/post-commit|pre-commit`
-- 试用中...
+- 各工具的配置文件、version都是直接覆盖
+- 请按需编辑`_husky/_/post-commit|pre-commit`，参考→[husky](https://typicode.github.io/husky/#/?id=create-a-hook)
+- 更多更合适的场景进行中......
 
----
+# todolist
 
-> https://juejin.cn/post/6966119324478079007
+- [] auto release

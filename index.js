@@ -8,9 +8,6 @@ const installTools = require('./src/installTools')
 const { spinner } = require('./src/utils/global')
 
 const main = async (projectName = '', toolsName = []) => {
-  console.log('\n', { projectName, toolsName }, '\n')
-
-  // let projectName = '' // 项目名
   let targetPath = '' // 项目绝对路径
 
   if (fs.existsSync(path.join(cwd, 'package.json'))) {
@@ -65,7 +62,11 @@ const main = async (projectName = '', toolsName = []) => {
   }
 
   // 3. 开始注入项目文件
-  installTools(targetPath, toolsName)
+  let pkg = {}
+  try {
+    pkg = require(path.join(targetPath, 'package.json'))
+  } catch {}
+  installTools(targetPath, toolsName, pkg)
 }
 
 module.exports = main

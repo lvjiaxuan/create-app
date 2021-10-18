@@ -46,3 +46,4 @@ lv add <tool-name...>
 # todolist
 
 - [ ] auto release
+- [ ] add skip option

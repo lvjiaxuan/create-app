@@ -2,11 +2,11 @@ module.exports = {
   env: {
     commonjs: true,
     browser: true,
-    es2021: true,
+    es6: true,// for globals and syntax
   },
   extends: ['eslint:recommended'],
   parserOptions: {
-    ecmaVersion: 12,
+    ecmaVersion: 'latest',
     sourceType: 'module',
   },
   globals: {

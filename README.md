@@ -1,28 +1,34 @@
-# @lvjx/create-app
+# @lvjiaxuan/create-app
 
 一个工程化工具安装的工具，旨在创建新项目或扩展旧项目。
+
+## **先折腾一下，就一下，不要问为什么**
+
+```base
+npm config set @lvjiaxuan:registry=https://npm.pkg.github.com
+```
 
 ## 用法
 
 初始化一个新项目：
 ```bash
 # 方式1
-npm init @lvjx/app
+npm init @lvjiaxuan/app
 
 # 方式2
-npm init @lvjx/create-app -g
+npm init @lvjiaxuan/create-app -g
 lv init <project-name> [tools-name...]
 ```
 
 为旧项目添加工具：
 ```bash
-npm i @lvjx/create-app -g
+npm i @lvjiaxuan/create-app -g
 lv add <tool-name...>
 ```
 
 > 根据当前`cwd`是否存在`package.json`来判断是否为项目，若无“项目”，add命令会创建一个
 
-# 可选的工具
+## 可选的工具
 
 - husky: git + husky + lint-staged
 - prettier: prettier

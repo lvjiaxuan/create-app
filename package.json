@@ -1,14 +1,12 @@
 {
-  "name": "@lvjx/create-app",
+  "name": "@lvjiaxuan/create-app",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "lint": "eslint ./src",
-    "test": "npm run lint",
-    "publish": "npm publish"
+    "test": "npm run lint"
   },
   "bin": {
-    "lva": "index.js",
     "lv": "main.js"
   },
   "keywords": [],
@@ -21,7 +19,7 @@
     "url": "https://github.com/lvjiaxuan/create-base-app"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/",
+    "registry": "https://npm.pkg.github.com",
     "access": "public"
   },
   "config": {
@@ -34,17 +32,17 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@lvjiaxuan/create-app": "^1.0.0",
     "axios": "^0.23.0",
     "commander": "^8.2.0",
     "cosmiconfig": "^7.0.1",
     "cross-spawn": "^7.0.3",
     "enquirer": "^2.3.6",
     "eslint": "^8.0.1",
+    "husky": "^7.0.2",
     "npm-check-updates": "^11.8.5",
     "ora": "^5.4.1",
     "prettier": "^2.4.1",
-    "prompts": "^2.4.2",
-    "husky": "^7.0.2"
-  },
-  "devDependencies": {}
+    "prompts": "^2.4.2"
+  }
 }

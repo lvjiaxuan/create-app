@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint ./src",
-    "test": "npm run lint"
+    "test": "npm run lint",
+    "version:patch": "npm version patch --no-git-tag-version"
   },
   "bin": {
     "lv": "main.js"

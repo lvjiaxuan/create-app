@@ -1,22 +1,16 @@
 # @lvjiaxuan/create-app
 
-一个工程化工具安装的工具，旨在创建新项目或扩展旧项目。
-
-## **先折腾一下，就一下，不要问为什么**
-
-```base
-npm config set @lvjiaxuan:registry=https://npm.pkg.github.com
-```
+新项目初始化 or 旧项目扩展。
 
 ## 用法
 
 初始化一个新项目：
 ```bash
 # 方式1
-npm init @lvjiaxuan/app
+pnpm init @lvjiaxuan/app --registry https://npm.pkg.github.com
 
 # 方式2
-npm init @lvjiaxuan/create-app -g
+pnpm install @lvjiaxuan/create-app -g --registry https://npm.pkg.github.com
 lv init <project-name> [tools-name...]
 ```
 

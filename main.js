@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
+// 全局命令 lv 入口
+
+console.log('main')
+console.log(process.argv)
+
 const program = require('commander')
 const pkgVersion = require('./package.json').version
 

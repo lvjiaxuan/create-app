@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
+// npm init 入口
+
+console.log('index')
+console.log(process.argv)
+
 const fs = require('fs')
 const path = require('path')
 const prompts = require('prompts')
@@ -55,7 +60,7 @@ const main = async (projectName = '', toolsName = []) => {
             title: 'babel: @babel/preset-env + @babel/plugin-transform-runtime + @babel/runtime-corejs3',
             value: 'babel',
           },
-          { title: 'commitizen: commitizen with customizable config', value: 'commitizen' },
+          { title: 'cz: commitizen with customizable config', value: 'cz' },
         ],
       })
     ).toolsName

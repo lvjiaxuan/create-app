@@ -5,22 +5,22 @@
 ## 用法
 
 初始化一个新项目：
-```bash
+```shell
 # 方式1
-pnpm init @lvjiaxuan/app --registry https://npm.pkg.github.com
+npm create @lvjiaxuan/app --registry=https://npm.pkg.github.com
 
 # 方式2
-pnpm install @lvjiaxuan/create-app -g --registry https://npm.pkg.github.com
+npm i @lvjiaxuan/create-app -g --registry https://npm.pkg.github.com
 lv init <project-name> [tools-name...]
 ```
 
 为旧项目添加工具：
-```bash
-npm i @lvjiaxuan/create-app -g
+```shell
+npm i @lvjiaxuan/create-pp -g --registry https://npm.pkg.github.com
 lv add <tool-name...>
 ```
 
-> 根据当前`cwd`是否存在`package.json`来判断是否为项目，若无“项目”，add命令会创建一个
+> 根据当前 *cwd* 是否存在 *package.json* 来判断是否为项目，若无“项目”，`add` 命令会创建一个
 
 ## 可选的工具
 

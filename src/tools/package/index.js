@@ -1,9 +1,9 @@
-const fs = require('fs')
-const path = require('path')
-const spawn = require('cross-spawn')
-const { spinnerAll, deepMerge } = require('./../../utils/global')
+import fs from 'fs'
+import path from 'path'
+import spawn from 'cross-spawn'
+import { spinnerAll, deepMerge } from './../../utils/global'
 
-module.exports = async (targetPath, pkg = {}) =>
+export default async (targetPath, pkg = {}) =>
   new Promise(resolve => {
     spinnerAll.start('package.json')
 
@@ -16,8 +16,9 @@ module.exports = async (targetPath, pkg = {}) =>
       browserslist: 'last 2 versions, > 1%, not dead',
       author: '',
       email: '',
+      files: [],
       homepage: 'https://github.com',
-      bug: {
+      bugs: {
         url: 'https://github.com',
       },
       repository: {

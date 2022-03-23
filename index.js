@@ -2,15 +2,13 @@
 
 // npm init 入口
 
-console.log('index')
-console.log(process.argv)
+import fs from 'fs'
+import path from 'path'
+import prompts from 'prompts'
+import installTools from './src/installTools'
+import { spinner } from './src/utils/global'
 
-const fs = require('fs')
-const path = require('path')
-const prompts = require('prompts')
 const cwd = process.cwd()
-const installTools = require('./src/installTools')
-const { spinner } = require('./src/utils/global')
 
 const main = async (projectName = '', toolsName = []) => {
   let targetPath = '' // 项目绝对路径
@@ -74,4 +72,4 @@ const main = async (projectName = '', toolsName = []) => {
   installTools(targetPath, toolsName, pkg)
 }
 
-module.exports = main
+export default main

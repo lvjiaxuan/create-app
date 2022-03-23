@@ -1,8 +1,8 @@
-const path = require('path')
-const copy = require('./../../utils/copy')
-const { spinnerAll, getLatestVersion } = require('./../../utils/global')
+import path from 'path'
+import copy from './../../utils/copy'
+import { spinnerAll, getLatestVersion } from './../../utils/global'
 
-module.exports = async targetPath => {
+export default async targetPath => {
   spinnerAll.start('babel')
   copy(path.join(__dirname, 'babel.config.js'), path.join(targetPath, 'babel.config.js'))
 

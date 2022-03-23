@@ -1,12 +1,12 @@
-const path = require('path')
-const fs = require('fs')
-const prettier = require('prettier')
-const spinner = require('ora')()
-const axios = require('axios')
+import path from 'path'
+import fs from 'fs'
+import prettier from 'prettier'
+import ora from 'ora'
+import axios from 'axios'
 
-exports.spinner = spinner
+const spinner = ora()
 
-exports.spinnerAll = (() => ({
+const spinnerAll = (() => ({
   appends: [],
   start(append) {
     append && this.appends.push(append)
@@ -53,14 +53,12 @@ const deepMerge = (target, ...args) => {
     }, acc)
   }, target)
 }
-exports.deepMerge = deepMerge
 
 const prettierConfig = {
   ...require(path.join(__dirname, '../tools/prettier/.prettierrc.js')),
   parser: 'babel',
 }
-exports.prettierConfig = prettierConfig
-exports.getPrettierCjsStr = (obj, prettierCustomConfig = {}) => {
+const getPrettierCjsStr = (obj, prettierCustomConfig = {}) => {
   const main = config =>
     Object.keys(config).reduce((acc, key) => {
       const checkValue = config[key]
@@ -87,7 +85,7 @@ exports.getPrettierCjsStr = (obj, prettierCustomConfig = {}) => {
   })
 }
 
-exports.mergeIgnore = (ignoreTplPath, ignoreTargetPath) => {
+const mergeIgnore = (ignoreTplPath, ignoreTargetPath) => {
   const tplArr = fs
     .readFileSync(ignoreTplPath, { encoding: 'utf8' })
     .split(/\n|\r/)
@@ -103,9 +101,11 @@ exports.mergeIgnore = (ignoreTplPath, ignoreTargetPath) => {
   fs.writeFileSync(ignoreTargetPath, removalDuplicates)
 }
 
-exports.getLatestVersion = pkgName =>
+const getLatestVersion = pkgName =>
   axios
     .get(`https://registry.npmmirror.com/${pkgName}/latest`, {
       headers: { 'content-type': 'application/json' },
     })
     .then(res => res.data.version)
+
+export { spinner, spinnerAll, deepMerge, prettierConfig, getPrettierCjsStr, mergeIgnore, getLatestVersion }

@@ -1,7 +1,7 @@
-const path = require('path')
-const fs = require('fs')
+import path from 'path'
+import fs from 'fs'
 
-module.exports = copy
+export default copy
 
 function copy(src, dest) {
   const stat = fs.statSync(src)

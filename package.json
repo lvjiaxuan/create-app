@@ -1,48 +1,60 @@
 {
   "name": "@lvjiaxuan/create-app",
-  "version": "1.0.1",
-  "main": "index.js",
+  "version": "0.0.2-3",
+  "main": "dist/out.js",
+  "author": "lvjiaxuan",
+  "email": "471501748@qq.com",
+  "license": "ISC",
+  "description": "Create a base application demo",
   "scripts": {
+    "watch": "npm run build -- --watch",
+    "build": "rimraf dist && esbuild index.js --bundle --outfile=dist/out.js --platform=node --target=node16",
     "lint": "eslint ./src",
     "test": "npm run lint",
     "version:patch": "npm version patch --no-git-tag-version"
   },
   "bin": {
-    "lv": "main.js"
+    "lv": "bin/main.js"
   },
   "keywords": [],
-  "file": [
-    "main.js",
-    "index.js"
+  "files": [
+    "bin",
+    "dist"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/lvjiaxuan/create-base-app"
+    "url": "https://github.com/lvjiaxuan/create-app"
+  },
+  "bugs": {
+    "url": "https://github.com/lvjiaxuan/create-app/issues"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
     "access": "public"
+  },
+  "engines": {
+    "node": ">=16",
+    "pnpm": ">=6"
   },
   "config": {
     "commitizen": {
       "path": "./src/tools/cz/.cz-simple"
     }
   },
-  "author": "lvjiaxuan",
-  "email": "471501748@qq.com",
-  "license": "ISC",
-  "description": "create a base application demo",
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
+    "prettier": "^2.6.0",
     "axios": "^0.26.1",
     "commander": "^9.1.0",
     "cosmiconfig": "^7.0.1",
     "cross-spawn": "^7.0.3",
     "enquirer": "^2.3.6",
+    "esbuild": "^0.14.27",
     "eslint": "^8.11.0",
     "husky": "^7.0.4",
     "npm-check-updates": "^12.5.4",
-    "ora": "^5.4.1",
-    "prettier": "^2.6.0",
-    "prompts": "^2.4.2"
+    "ora": "^6.1.0",
+    "prompts": "^2.4.2",
+    "rimraf": "^3.0.2"
   }
 }

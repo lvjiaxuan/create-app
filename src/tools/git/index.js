@@ -1,9 +1,9 @@
-const path = require('path')
-const spawn = require('cross-spawn')
-const copy = require('./../../utils/copy')
-const { spinnerAll } = require('./../../utils/global')
+import path from 'path'
+import spawn from 'cross-spawn'
+import copy from './../../utils/copy'
+import { spinnerAll } from './../../utils/global'
 
-module.exports = async targetPath => {
+export default async targetPath => {
   spinnerAll.start('git')
   copy(path.join(__dirname, '_gitignore'), path.join(targetPath, '.gitignore'))
   return {

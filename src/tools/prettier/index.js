@@ -1,8 +1,8 @@
-const path = require('path')
-const copy = require('./../../utils/copy')
-const { spinnerAll, getLatestVersion } = require('./../../utils/global')
+import path from 'path'
+import copy from './../../utils/copy'
+import { spinnerAll, getLatestVersion } from './../../utils/global'
 
-module.exports = async targetPath => {
+export default async targetPath => {
   spinnerAll.start('prettier')
   copy(path.join(__dirname, '.prettierrc.js'), path.join(targetPath, '.prettierrc.js'))
   copy(path.join(__dirname, '.prettierignore'), path.join(targetPath, '.prettierignore'))

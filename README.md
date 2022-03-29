@@ -6,17 +6,17 @@
 
 初始化一个新项目：
 ```bash
-# 方式1
-npm create @lvjiaxuan/app --registry=https://npm.pkg.github.com
+# 方式1 todo
+# npm create @lvjiaxuan/app --registry=https://npm.pkg.github.com
 
 # 方式2
-npm i @lvjiaxuan/create-app -g --registry https://npm.pkg.github.com
+npm i @lvjiaxuan/app -g --registry https://npm.pkg.github.com
 lv init <project-name> [tools-name...]
 ```
 
 为旧项目添加工具：
 ```bash
-npm i @lvjiaxuan/create-pp -g --registry https://npm.pkg.github.com
+npm i @lvjiaxuan/app -g --registry https://npm.pkg.github.com
 lv add <tool-name...>
 ```
 

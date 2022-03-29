@@ -1,7 +1,3 @@
-#!/usr/bin/env node
-
-// npm init 入口
-
 import fs from 'fs'
 import path from 'path'
 import prompts from 'prompts'

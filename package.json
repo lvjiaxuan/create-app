@@ -1,20 +1,21 @@
 {
   "name": "@lvjiaxuan/create-app",
-  "version": "0.0.2-4",
+  "version": "0.0.2-16",
   "description": "Create a base application demo",
   "author": "lvjiaxuan",
   "email": "471501748@qq.com",
-  "license": "ISC",
+  "license": "MIT",
   "keywords": [],
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.mjs",
+  "main": "",
+  "module": "",
   "types": "",
   "bin": {
-    "lv": "bin/main.js"
+    "lv": "bin/cli.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lvjiaxuan/create-app"
+    "url": "https://github.com/lvjiaxuan/create-app",
+    "directory": "./"
   },
   "exports": {
     ".": {
@@ -26,8 +27,8 @@
   "scripts": {
     "watch": "pnpm run build -- -- --watch",
     "build": "rimraf dist && pnpm run build:cjs",
-    "build:cjs": "esbuild main.js index.js --bundle --outdir=dist/cjs --platform=node --target=node16",
-    "build:esm": "esbuild main.js index.js --bundle --splitting --format=esm --outdir=dist/esm --platform=node --target=node16",
+    "build:cjs": "esbuild cli.js --bundle --outdir=dist/cjs --platform=node --target=node16",
+    "build:esm": "esbuild cli.js --bundle --splitting --format=esm --outdir=dist/esm --platform=node --target=node16",
     "lint": "eslint ./src",
     "test": "pnpm run lint",
     "version:patch": "npm version patch --no-git-tag-version"

@@ -1,6 +1,8 @@
 import { Command } from 'commander'
 import * as pkg from './package.json'
 
+console.log(process)
+
 const program = new Command
 
 /**
@@ -13,11 +15,11 @@ program
   .description(
     '初始化一个项目；[project-name]：项目名 必填输入；[tools-name]：要按照的工具名，选填，可多选，全量`husky prettier eslint babel cz`'
   )
-  .action((projectName, toolsName) => require('./index')(projectName, toolsName))
+  .action((projectName, toolsName) => require('./create')(projectName, toolsName))
 
 program
   .command('add [tools-name...]')
   .description('配置一个项目，根据当前是否存在项目进行工具安装')
-  .action(toolsName => require('./index')('', toolsName))
+  .action(toolsName => require('./create')('', toolsName))
 
 program.parse()

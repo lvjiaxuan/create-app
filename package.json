@@ -1,33 +1,45 @@
 {
   "name": "@lvjiaxuan/create-app",
-  "version": "0.0.2-3",
-  "main": "dist/out.js",
+  "version": "0.0.2-4",
+  "description": "Create a base application demo",
   "author": "lvjiaxuan",
   "email": "471501748@qq.com",
   "license": "ISC",
-  "description": "Create a base application demo",
-  "scripts": {
-    "watch": "npm run build -- --watch",
-    "build": "rimraf dist && esbuild index.js --bundle --outfile=dist/out.js --platform=node --target=node16",
-    "lint": "eslint ./src",
-    "test": "npm run lint",
-    "version:patch": "npm version patch --no-git-tag-version"
-  },
+  "keywords": [],
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.mjs",
+  "types": "",
   "bin": {
     "lv": "bin/main.js"
   },
-  "keywords": [],
-  "files": [
-    "bin",
-    "dist"
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/lvjiaxuan/create-app"
   },
+  "exports": {
+    ".": {
+      "require": "",
+      "import": ""
+    },
+    "./index.mjs": ""
+  },
+  "scripts": {
+    "watch": "pnpm run build -- -- --watch",
+    "build": "rimraf dist && pnpm run build:cjs",
+    "build:cjs": "esbuild main.js index.js --bundle --outdir=dist/cjs --platform=node --target=node16",
+    "build:esm": "esbuild main.js index.js --bundle --splitting --format=esm --outdir=dist/esm --platform=node --target=node16",
+    "lint": "eslint ./src",
+    "test": "pnpm run lint",
+    "version:patch": "npm version patch --no-git-tag-version"
+  },
+  "files": [
+    "bin",
+    "dist"
+  ],
   "bugs": {
     "url": "https://github.com/lvjiaxuan/create-app/issues"
   },
+  "homepage": "https://github.com/lvjiaxuan/create-app#readme",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
     "access": "public"
@@ -43,14 +55,14 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "prettier": "^2.6.0",
+    "prettier": "^2.6.1",
     "axios": "^0.26.1",
     "commander": "^9.1.0",
     "cosmiconfig": "^7.0.1",
     "cross-spawn": "^7.0.3",
     "enquirer": "^2.3.6",
-    "esbuild": "^0.14.27",
-    "eslint": "^8.11.0",
+    "esbuild": "^0.14.28",
+    "eslint": "^8.12.0",
     "husky": "^7.0.4",
     "npm-check-updates": "^12.5.4",
     "ora": "^6.1.0",

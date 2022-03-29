@@ -48,10 +48,10 @@ export default async (targetPath, pkg = {}) =>
     )
     spinnerAll.succeed('package.json')
 
-    spinnerAll.start('npm install')
-    spawn('npm i', { stdio: 'pipe', cwd: targetPath }).on('close', code => {
+    spinnerAll.start('pnpm install')
+    spawn('pnpm i', { stdio: 'pipe', cwd: targetPath }).on('close', code => {
       if (code == 0) {
-        spinnerAll.succeed('npm install')
+        spinnerAll.succeed('pnpm install')
         resolve()
       }
     })

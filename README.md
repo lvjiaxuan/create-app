@@ -5,7 +5,7 @@
 ## 用法
 
 初始化一个新项目：
-```shell
+```bash
 # 方式1
 npm create @lvjiaxuan/app --registry=https://npm.pkg.github.com
 
@@ -15,14 +15,14 @@ lv init <project-name> [tools-name...]
 ```
 
 为旧项目添加工具：
-```shell
+```bash
 npm i @lvjiaxuan/create-pp -g --registry https://npm.pkg.github.com
 lv add <tool-name...>
 ```
 
-> 根据当前 *cwd* 是否存在 *package.json* 来判断是否为项目，若无“项目”，`add` 命令会创建一个
+> 根据当前 *cwd* 是否存在 *package.json* 来判断是否为项目，若无“项目”，`add` 命令会自动创建一个
 
-## 可选的工具
+## 可选的工具 <tool-name...>
 
 - husky: git + husky + lint-staged
 - prettier: prettier
@@ -40,10 +40,9 @@ lv add <tool-name...>
 # notes
 
 - 各工具的配置文件、version都是直接覆盖
-- 请按需编辑`_husky/_/post-commit|pre-commit`，参考→[husky](https://typicode.github.io/husky/#/?id=create-a-hook)
-- 更多更合适的场景进行中......
+- 请按需编辑 *_husky/_/post-commit|pre-commit*，参考→[husky](https://typicode.github.io/husky/#/?id=create-a-hook)
+- WIP
 
-# todolist
+# todo
 
-- [ ] auto release
-- [ ] add skip option
+- [ ] check pnpm

@@ -10,13 +10,13 @@
 # npm create @lvjiaxuan/app --registry=https://npm.pkg.github.com
 
 # 方式2
-npm i @lvjiaxuan/app -g --registry https://npm.pkg.github.com
+npm i @lvjiaxuan/app -g --registry=https://npm.pkg.github.com
 lv init <project-name> [tools-name...]
 ```
 
 为旧项目添加工具：
 ```bash
-npm i @lvjiaxuan/app -g --registry https://npm.pkg.github.com
+npm i @lvjiaxuan/app -g --registry=https://npm.pkg.github.com
 lv add <tool-name...>
 ```
 

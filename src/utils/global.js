@@ -1,4 +1,3 @@
-import path from 'path'
 import fs from 'fs'
 import prettier from 'prettier'
 import ora from 'ora'
@@ -55,7 +54,7 @@ const deepMerge = (target, ...args) => {
 }
 
 const prettierConfig = {
-  ...require(path.join(__dirname, '../tools/prettier/.prettierrc.js')),
+  ...require('./../tools/prettier/.prettierrc.js'),
   parser: 'babel',
 }
 const getPrettierCjsStr = (obj, prettierCustomConfig = {}) => {

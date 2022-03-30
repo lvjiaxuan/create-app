@@ -22,13 +22,12 @@
       "require": "",
       "import": ""
     },
-    "./index.mjs": ""
+    "./dist/esm/create.mjs": ""
   },
   "scripts": {
-    "watch": "pnpm run build -- -- --watch",
-    "build": "rimraf dist && pnpm run build:cjs",
-    "build:cjs": "esbuild cli.js --bundle --outdir=dist/cjs --platform=node --target=node16",
-    "build:esm": "esbuild cli.js --bundle --splitting --format=esm --outdir=dist/esm --platform=node --target=node16",
+    "cli": "node ./bin/cli",
+    "watch": "rimraf dist && esno esbuild.config --watch",
+    "build": "esno esbuild.config",
     "lint": "eslint ./src",
     "test": "pnpm run lint",
     "version:patch": "npm version patch --no-git-tag-version"
@@ -54,9 +53,7 @@
       "path": "./src/tools/cz/.cz-simple"
     }
   },
-  "dependencies": {},
   "devDependencies": {
-    "prettier": "^2.6.1",
     "axios": "^0.26.1",
     "commander": "^9.1.0",
     "cosmiconfig": "^7.0.1",
@@ -64,9 +61,11 @@
     "enquirer": "^2.3.6",
     "esbuild": "^0.14.28",
     "eslint": "^8.12.0",
+    "esno": "^0.14.1",
     "husky": "^7.0.4",
     "npm-check-updates": "^12.5.4",
     "ora": "^6.1.0",
+    "prettier": "^2.6.1",
     "prompts": "^2.4.2",
     "rimraf": "^3.0.2"
   }

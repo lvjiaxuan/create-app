@@ -1,8 +1,6 @@
 import { Command } from 'commander'
 import * as pkg from './package.json'
 
-console.log(process)
-
 const program = new Command
 
 /**

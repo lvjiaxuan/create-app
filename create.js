@@ -68,4 +68,6 @@ const main = async (projectName = '', toolsName = []) => {
   installTools(targetPath, toolsName, pkg)
 }
 
+main().catch(e => console.error(e))
+
 export default main

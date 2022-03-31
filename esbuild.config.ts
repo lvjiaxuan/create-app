@@ -13,7 +13,7 @@ const baseOptions: BuildOptions = {
         },
       }
     : false,
-  entryPoints: ['./create.js'],
+  entryPoints: ['./packages/create-app/index.js', './packages/lv/index.js'],
   bundle: true,
   platform: 'node',
   target: 'node16',

@@ -1,28 +1,9 @@
 {
-  "name": "@lvjiaxuan/create-app",
-  "version": "0.0.2-16",
-  "description": "Create a base application demo",
-  "author": "lvjiaxuan",
-  "email": "471501748@qq.com",
-  "license": "MIT",
-  "keywords": [],
-  "main": "",
-  "module": "",
-  "types": "",
-  "bin": {
-    "lv": "bin/cli.js"
-  },
+  "name": "monorepo",
+  "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lvjiaxuan/create-app",
-    "directory": "./"
-  },
-  "exports": {
-    ".": {
-      "require": "",
-      "import": ""
-    },
-    "./dist/esm/create.mjs": ""
+    "url": "https://github.com/lvjiaxuan/create-app"
   },
   "scripts": {
     "cli": "node ./bin/cli",
@@ -32,41 +13,20 @@
     "test": "pnpm run lint",
     "version:patch": "npm version patch --no-git-tag-version"
   },
-  "files": [
-    "bin",
-    "dist"
-  ],
   "bugs": {
     "url": "https://github.com/lvjiaxuan/create-app/issues"
   },
   "homepage": "https://github.com/lvjiaxuan/create-app#readme",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "public"
-  },
   "engines": {
     "node": ">=16",
     "pnpm": ">=6"
   },
-  "config": {
-    "commitizen": {
-      "path": "./src/tools/cz/.cz-simple"
-    }
-  },
   "devDependencies": {
-    "axios": "^0.26.1",
-    "commander": "^9.1.0",
-    "cosmiconfig": "^7.0.1",
-    "cross-spawn": "^7.0.3",
-    "enquirer": "^2.3.6",
     "esbuild": "^0.14.28",
     "eslint": "^8.12.0",
     "esno": "^0.14.1",
     "husky": "^7.0.4",
-    "npm-check-updates": "^12.5.4",
-    "ora": "^6.1.0",
     "prettier": "^2.6.1",
-    "prompts": "^2.4.2",
     "rimraf": "^3.0.2"
   }
 }

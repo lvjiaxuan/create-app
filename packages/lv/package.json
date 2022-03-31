@@ -1,0 +1,39 @@
+{
+  "name": "@lvjiaxuan/lv",
+  "version": "0.0.1",
+  "description": "",
+  "author": "lvjiaxuan <471501748@qq.com> (https://github.com/lvjiaxuan)",
+  "main": "index.js",
+  "module": "index.ts",
+  "types": "index.d.ts",
+  "scripts": {},
+  "files": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lvjiaxuan",
+    "directory": "packages/lv"
+  },
+  "exports": {
+    ".": {
+      "require": "index.js",
+      "import": "index.mjs"
+    },
+    "./esm.mjs": "index.mjs"
+  },
+  "bugs": {
+    "url": "https://github.com/lvjiaxuan"
+  },
+  "homepage": "https://github.com/lvjiaxuan",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com or https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=16",
+    "pnpm": ">=6"
+  },
+  "dependencies": {
+    "@lvjiaxuan/create-app": "workspace:^0.0.1",
+    "commander": "^9.1.0"
+  }
+}

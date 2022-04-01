@@ -3,11 +3,14 @@
   "version": "0.0.1",
   "description": "",
   "author": "lvjiaxuan <471501748@qq.com> (https://github.com/lvjiaxuan)",
-  "main": "index.js",
-  "module": "index.ts",
-  "types": "index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "",
+  "bin": {
+    "lv": "bin/index.js"
+  },
   "scripts": {},
-  "files": [],
+  "files": ["dist"],
   "repository": {
     "type": "git",
     "url": "https://github.com/lvjiaxuan",
@@ -15,17 +18,14 @@
   },
   "exports": {
     ".": {
-      "require": "index.js",
-      "import": "index.mjs"
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
     },
-    "./esm.mjs": "index.mjs"
+    "./index.mjs": "index.mjs"
   },
-  "bugs": {
-    "url": "https://github.com/lvjiaxuan"
-  },
-  "homepage": "https://github.com/lvjiaxuan",
+  "homepage": "https://github.com/lvjiaxuan/create-app#readme",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com or https://registry.npmjs.org/",
+    "registry": "https://npm.pkg.github.com",
     "access": "public"
   },
   "engines": {

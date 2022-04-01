@@ -1,4 +1,4 @@
-import create from '@lvjiaxuan/create-app'
+import create from '@lvjiaxuan/create-app/create'
 import { Command } from 'commander'
 import * as pkg from './package.json'
 

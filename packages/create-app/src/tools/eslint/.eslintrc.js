@@ -1,8 +1,9 @@
 module.exports = {
   env: {
-    commonjs: true,
-    browser: true,
-    es6: true,// for globals and syntax
+    node: true,
+    // commonjs: true,
+    // browser: true,
+    es6: true, // for globals and syntax
   },
   extends: ['eslint:recommended'],
   parserOptions: {
@@ -11,6 +12,9 @@ module.exports = {
   },
   globals: {
     process: 'readonly',
-    __dirname: 'readonly'
+    __dirname: 'readonly',
+  },
+  rules: {
+    'no-empty': ['error', { allowEmptyCatch: true }],
   },
 }

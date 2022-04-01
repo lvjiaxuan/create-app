@@ -6,11 +6,9 @@
     "url": "https://github.com/lvjiaxuan/create-app"
   },
   "scripts": {
-    "cli": "node ./bin/cli",
     "watch": "rimraf dist && esno esbuild.config --watch",
     "build": "esno esbuild.config",
-    "lint": "eslint ./src",
-    "test": "pnpm run lint",
+    "lint": "eslint \"packages/**/*.js\"",
     "version:patch": "npm version patch --no-git-tag-version"
   },
   "bugs": {
@@ -22,11 +20,19 @@
     "pnpm": ">=6"
   },
   "devDependencies": {
+    "@types/node": "^17.0.23",
     "esbuild": "^0.14.28",
+    "esbuild-plugin-clean": "^0.9.0",
     "eslint": "^8.12.0",
     "esno": "^0.14.1",
+    "glob": "^7.2.0",
     "husky": "^7.0.4",
+    "minimist": "^1.2.6",
     "prettier": "^2.6.1",
     "rimraf": "^3.0.2"
+  },
+  "eslintIgnore": [],
+  "eslintConfig": {
+    "extends": "./packages/create-app/src/tools/eslint/.eslintrc.js"
   }
 }
